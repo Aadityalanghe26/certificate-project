@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CertChain - Blockchain Certificate Platform | Final Presentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a1a;
+            color: #fff;
+            overflow: hidden;
+        }
+
+        .presentation {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .slide {
+            width: 100%;
+            height: 100%;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 60px;
+            text-align: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .slide.active {
+            display: flex;
+        }
+
+        .slide::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800"><defs><pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="1"/></pattern></defs><rect width="1200" height="800" fill="url(%23grid)"/></svg>');
+            pointer-events: none;
+        }
+
+        .slide-content {
+            position: relative;
+            z-index: 1;
+            max-width: 1000px;
+        }
+
+        /* Slide Variations */
+        .slide-1 { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .slide-2 { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+        .slide-3 { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+        .slide-4 { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+        .slide-5 { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
+        .slide-6 { background: linear-gradient(135deg, #30cfd0 0%, #330867 100%); }
+        .slide-7 { background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); }
+        .slide-8 { background: linear-gradient(135deg, #ff9a56 0%, #ff6a88 100%); }
+        .slide-9 { background: linear-gradient(135deg, #2e2e78 0%, #662d8c 100%); }
+        .slide-10 { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .slide-11 { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+        .slide-12 { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+        .slide-13 { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+
+        h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        h2 {
+            font-size: 2.8rem;
+            font-weight: 700;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        h3 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        p {
+            font-size: 1.3rem;
+            line-height: 1.8;
+            margin-bottom: 15px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+        }
+
+        .subtitle {
+            font-size: 1.5rem;
+            opacity: 0.95;
+            margin-bottom: 40px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+        }
+
+        .date {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-top: 40px;
+        }
+
+        .team-info {
+            font-size: 1.2rem;
+            margin-top: 30px;
+            opacity: 0.95;
+        }
+
+        .problem-box {
+            background: rgba(255,255,255,0.15);
+            padding: 25px;
+            border-radius: 15px;
+            margin: 15px 0;
+            border-left: 5px solid rgba(255,255,255,0.5);
+            text-align: left;
+            font-size: 1.1rem;
+        }
+
+        .solution-box {
+            background: rgba(255,255,255,0.15);
+            padding: 25px;
+            border-radius: 15px;
+            margin: 15px 0;
+            border-left: 5px solid rgba(255,255,255,0.5);
+            text-align: left;
+            font-size: 1.1rem;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 30px 0;
+            text-align: left;
+        }
+
+        .feature-item {
+            background: rgba(255,255,255,0.15);
+            padding: 20px;
+            border-radius: 10px;
+            font-size: 1rem;
+        }
+
+        .feature-item strong {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+
+        .tech-stack {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+            margin: 30px 0;
+            text-align: left;
+        }
+
+        .tech-item {
+            background: rgba(255,255,255,0.15);
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+        }
+
+        .tech-item strong {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .architecture-box {
+            background: rgba(255,255,255,0.15);
+            padding: 30px;
+            border-radius: 15px;
+            margin: 20px 0;
+            text-align: left;
+            font-size: 1rem;
+            line-height: 2;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .stat-box {
+            background: rgba(255,255,255,0.15);
+            padding: 25px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            opacity: 0.95;
+        }
+
+        .evaluation-table {
+            width: 100%;
+            margin: 30px 0;
+            border-collapse: collapse;
+            font-size: 1rem;
+        }
+
+        .evaluation-table th,
+        .evaluation-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 2px solid rgba(255,255,255,0.3);
+        }
+
+        .evaluation-table th {
+            background: rgba(255,255,255,0.2);
+            font-weight: 700;
+        }
+
+        .evaluation-table tr:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .controls {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            z-index: 100;
+        }
+
+        button {
+            background: rgba(255,255,255,0.3);
+            color: white;
+            border: 2px solid white;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            background: rgba(255,255,255,0.5);
+            transform: scale(1.05);
+        }
+
+        .slide-counter {
+            position: fixed;
+            top: 20px;
+            right: 30px;
+            background: rgba(255,255,255,0.2);
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .highlight {
+            background: rgba(255,255,255,0.3);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .benefit-list {
+            text-align: left;
+            display: inline-block;
+            font-size: 1.1rem;
+            line-height: 2;
+        }
+
+        .benefit-list li {
+            list-style: none;
+            margin-bottom: 10px;
+        }
+
+        .benefit-list li:before {
+            content: "✓ ";
+            font-weight: bold;
+            margin-right: 10px;
+            font-size: 1.3rem;
+        }
+
+        .future-list {
+            text-align: left;
+            display: inline-block;
+            font-size: 1rem;
+            line-height: 1.8;
+        }
+
+        .future-list li {
+            list-style: none;
+            margin-bottom: 8px;
+        }
+
+        .future-list li:before {
+            content: "→ ";
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .conclusion-text {
+            font-size: 1.4rem;
+            line-height: 2;
+            margin: 30px 0;
+        }
+
+        @media (max-width: 1024px) {
+            h1 { font-size: 2.5rem; }
+            h2 { font-size: 2rem; }
+            p { font-size: 1.1rem; }
+            .slide { padding: 40px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="presentation">
+        <!-- Slide 1: Title Slide -->
+        <div class="slide slide-1 active">
+            <div class="slide-content">
+                <h1>🔗 CertChain</h1>
+                <p class="subtitle">Blockchain Certificate Platform</p>
+                <p style="font-size: 1.2rem; margin-top: 40px;">Decentralized Application for Issuing & Verifying Tamper-Proof Certificates</p>
+                <div class="team-info">
+                    <p><strong>BSc Blockchain Engineering Project</strong></p>
+                    <p style="margin-top: 20px;">Smart Contract Development | Web3 Integration | Decentralized Architecture</p>
+                    <p class="date">2024</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 2: Problem Statement -->
+        <div class="slide slide-2">
+            <div class="slide-content">
+                <h2>🎯 Problem Statement</h2>
+                <div class="problem-box">
+                    <strong>Certificate Fraud:</strong> Traditional certificates can be forged or altered
+                </div>
+                <div class="problem-box">
+                    <strong>Centralized Trust:</strong> Verification requires contacting the issuing institution
+                </div>
+                <div class="problem-box">
+                    <strong>Slow Verification:</strong> Manual verification processes are time-consuming
+                </div>
+                <div class="problem-box">
+                    <strong>Single Point of Failure:</strong> Centralized databases can be compromised
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: Solution Overview -->
+        <div class="slide slide-3">
+            <div class="slide-content">
+                <h2>💡 Solution: CertChain</h2>
+                <div class="solution-box">
+                    <strong>✓ Immutable Records:</strong> Certificates stored permanently on blockchain
+                </div>
+                <div class="solution-box">
+                    <strong>✓ Instant Verification:</strong> Anyone can verify authenticity without intermediaries
+                </div>
+                <div class="solution-box">
+                    <strong>✓ Decentralized:</strong> No single point of failure or control
+                </div>
+                <div class="solution-box">
+                    <strong>✓ Transparent:</strong> Complete audit trail of all issuances
+                </div>
+                <div class="solution-box">
+                    <strong>✓ Efficient:</strong> Eliminates intermediaries and reduces verification time
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: System Architecture -->
+        <div class="slide slide-4">
+            <div class="slide-content">
+                <h2>🏗️ System Architecture</h2>
+                <div class="architecture-box">
+                    <strong>Frontend Layer:</strong> HTML/CSS/JavaScript with MetaMask Integration<br>
+                    <strong>Backend Layer:</strong> Express.js API Server<br>
+                    <strong>Blockchain Layer:</strong> Solidity Smart Contract on Ethereum/Sepolia<br>
+                    <strong>Storage Layer:</strong> IPFS via Pinata for Decentralized File Storage
+                </div>
+                <p style="margin-top: 30px; font-size: 1.1rem;">
+                    <span class="highlight">Frontend</span> → <span class="highlight">Backend API</span> → <span class="highlight">Smart Contract</span> → <span class="highlight">IPFS</span>
+                </p>
+            </div>
+        </div>
+
+        <!-- Slide 5: Smart Contract Design -->
+        <div class="slide slide-5">
+            <div class="slide-content">
+                <h2>📝 Smart Contract Design</h2>
+                <div class="feature-grid">
+                    <div class="feature-item">
+                        <strong>Core Functions:</strong>
+                        • issueCertificate()<br>
+                        • verifyCertificate()<br>
+                        • getCertificatesByIssuer()<br>
+                        • certificateExists()
+                    </div>
+                    <div class="feature-item">
+                        <strong>Security Features:</strong>
+                        • Input validation<br>
+                        • Duplicate prevention<br>
+                        • No reentrancy risks<br>
+                        • Event logging
+                    </div>
+                    <div class="feature-item">
+                        <strong>Data Structure:</strong>
+                        • Certificate ID<br>
+                        • Student Name<br>
+                        • Course Name<br>
+                        • IPFS Hash
+                    </div>
+                    <div class="feature-item">
+                        <strong>Performance:</strong>
+                        • Gas: 80K-120K per issuance<br>
+                        • O(1) lookups<br>
+                        • Optimized storage<br>
+                        • Deployed on Sepolia
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: Backend API -->
+        <div class="slide slide-6">
+            <div class="slide-content">
+                <h2>⚙️ Backend API</h2>
+                <div class="feature-grid">
+                    <div class="feature-item">
+                        <strong>POST /upload</strong><br>
+                        Upload files to IPFS via Pinata<br>
+                        Returns IPFS hash
+                    </div>
+                    <div class="feature-item">
+                        <strong>POST /issue</strong><br>
+                        Issue certificate on-chain<br>
+                        Returns transaction hash
+                    </div>
+                    <div class="feature-item">
+                        <strong>GET /verify/:id</strong><br>
+                        Retrieve certificate data<br>
+                        Returns certificate details
+                    </div>
+                    <div class="feature-item">
+                        <strong>GET /health</strong><br>
+                        Check server status<br>
+                        Returns health status
+                    </div>
+                </div>
+                <p style="margin-top: 30px; font-size: 1.1rem;">
+                    <strong>Framework:</strong> Express.js | <strong>Web3:</strong> ethers.js v6 | <strong>Storage:</strong> IPFS/Pinata
+                </p>
+            </div>
+        </div>
+
+        <!-- Slide 7: Frontend Features -->
+        <div class="slide slide-7">
+            <div class="slide-content">
+                <h2>🎨 Frontend Features</h2>
+                <div class="feature-grid">
+                    <div class="feature-item">
+                        <strong>Wallet Connection</strong><br>
+                        MetaMask integration<br>
+                        Network validation
+                    </div>
+                    <div class="feature-item">
+                        <strong>Certificate Issuance</strong><br>
+                        Beautiful form UI<br>
+                        File upload support
+                    </div>
+                    <div class="feature-item">
+                        <strong>Certificate Verification</strong><br>
+                        Instant blockchain lookup<br>
+                        Beautiful preview card
+                    </div>
+                    <div class="feature-item">
+                        <strong>Certificate History</strong><br>
+                        View all issued certificates<br>
+                        Quick verification
+                    </div>
+                    <div class="feature-item">
+                        <strong>PDF Export</strong><br>
+                        Download certificates<br>
+                        Formatted design
+                    </div>
+                    <div class="feature-item">
+                        <strong>Responsive Design</strong><br>
+                        Desktop & mobile<br>
+                        Modern dark theme
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: Tech Stack -->
+        <div class="slide slide-8">
+            <div class="slide-content">
+                <h2>🛠️ Technology Stack</h2>
+                <div class="tech-stack">
+                    <div class="tech-item">
+                        <strong>Smart Contracts</strong><br>
+                        Solidity 0.8.28<br>
+                        Hardhat 3.3.0+
+                    </div>
+                    <div class="tech-item">
+                        <strong>Frontend</strong><br>
+                        HTML5/CSS3<br>
+                        JavaScript ES6+
+                    </div>
+                    <div class="tech-item">
+                        <strong>Web3</strong><br>
+                        ethers.js v6<br>
+                        MetaMask
+                    </div>
+                    <div class="tech-item">
+                        <strong>Backend</strong><br>
+                        Node.js 18+<br>
+                        Express.js 4.18+
+                    </div>
+                    <div class="tech-item">
+                        <strong>Storage</strong><br>
+                        IPFS<br>
+                        Pinata API
+                    </div>
+                    <div class="tech-item">
+                        <strong>Blockchain</strong><br>
+                        Ethereum<br>
+                        Sepolia Testnet
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9: Testing & Security -->
+        <div class="slide slide-9">
+            <div class="slide-content">
+                <h2>🔒 Testing & Security</h2>
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <div class="stat-number">15</div>
+                        <div class="stat-label">Unit Tests</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">100%</div>
+                        <div class="stat-label">Pass Rate</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">80-120K</div>
+                        <div class="stat-label">Gas per Issuance</div>
+                    </div>
+                </div>
+                <div class="feature-grid" style="margin-top: 30px;">
+                    <div class="feature-item">
+                        <strong>Security Measures:</strong>
+                        • Input validation<br>
+                        • No reentrancy<br>
+                        • Private key protection<br>
+                        • CORS enabled
+                    </div>
+                    <div class="feature-item">
+                        <strong>Testing Coverage:</strong>
+                        • Unit tests<br>
+                        • Integration tests<br>
+                        • Error scenarios<br>
+                        • Edge cases
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 10: Deployment & Status -->
+        <div class="slide slide-10">
+            <div class="slide-content">
+                <h2>🚀 Deployment Status</h2>
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <div class="stat-number">✓</div>
+                        <div class="stat-label">Local Development</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">✓</div>
+                        <div class="stat-label">Sepolia Testnet</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">✓</div>
+                        <div class="stat-label">Production Ready</div>
+                    </div>
+                </div>
+                <div class="feature-grid" style="margin-top: 30px;">
+                    <div class="feature-item">
+                        <strong>Development:</strong>
+                        • Hardhat Local Node<br>
+                        • Backend on :3000<br>
+                        • Full testing suite
+                    </div>
+                    <div class="feature-item">
+                        <strong>Testnet:</strong>
+                        • Sepolia Network<br>
+                        • Contract Deployed<br>
+                        • All features tested
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 11: Project Statistics -->
+        <div class="slide slide-11">
+            <div class="slide-content">
+                <h2>📊 Project Statistics</h2>
+                <table class="evaluation-table">
+                    <tr>
+                        <th>Component</th>
+                        <th>Details</th>
+                    </tr>
+                    <tr>
+                        <td>Smart Contract</td>
+                        <td>~150 lines (with NatSpec documentation)</td>
+                    </tr>
+                    <tr>
+                        <td>Backend API</td>
+                        <td>~200 lines (with JSDoc documentation)</td>
+                    </tr>
+                    <tr>
+                        <td>Frontend</td>
+                        <td>~1,100 lines (HTML/CSS/JavaScript)</td>
+                    </tr>
+                    <tr>
+                        <td>Test Suite</td>
+                        <td>~400 lines (15 test cases)</td>
+                    </tr>
+                    <tr>
+                        <td>Documentation</td>
+                        <td>10 files, 121 KB, ~3,000 lines</td>
+                    </tr>
+                    <tr>
+                        <td>Total Code</td>
+                        <td>~2,850 lines</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- Slide 12: Evaluation Criteria -->
+        <div class="slide slide-12">
+            <div class="slide-content">
+                <h2>📈 Evaluation Criteria</h2>
+                <table class="evaluation-table">
+                    <tr>
+                        <th>Criteria</th>
+                        <th>Marks</th>
+                        <th>Status</th>
+                    </tr>
+                    <tr>
+                        <td>Innovation in Idea</td>
+                        <td>10</td>
+                        <td>✓ Complete</td>
+                    </tr>
+                    <tr>
+                        <td>Smart Contract Quality & Logic</td>
+                        <td>20</td>
+                        <td>✓ Complete</td>
+                    </tr>
+                    <tr>
+                        <td>UI/UX & Integration</td>
+                        <td>15</td>
+                        <td>✓ Complete</td>
+                    </tr>
+                    <tr>
+                        <td>Functionality & Testing</td>
+                        <td>15</td>
+                        <td>✓ Complete</td>
+                    </tr>
+                    <tr>
+                        <td>Documentation & Report</td>
+                        <td>15</td>
+                        <td>✓ Complete</td>
+                    </tr>
+                    <tr>
+                        <td>Weekly Progress & Participation</td>
+                        <td>10</td>
+                        <td>✓ Complete</td>
+                    </tr>
+                    <tr>
+                        <td>Final Presentation/Demo</td>
+                        <td>15</td>
+                        <td>⏳ In Progress</td>
+                    </tr>
+                    <tr style="background: rgba(255,255,255,0.2); font-weight: bold;">
+                        <td>TOTAL</td>
+                        <td>100</td>
+                        <td>85/100</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- Slide 13: Future Enhancements -->
+        <div class="slide slide-13">
+            <div class="slide-content">
+                <h2>🔮 Future Enhancements</h2>
+                <ul class="future-list">
+                    <li><strong>Certificate Revocation:</strong> Ability to revoke issued certificates</li>
+                    <li><strong>Multi-Signature:</strong> Require multiple signers for certificate issuance</li>
+                    <li><strong>Batch Issuance:</strong> Issue multiple certificates at once</li>
+                    <li><strong>Advanced Search:</strong> Search and filtering capabilities</li>
+                    <li><strong>Admin Dashboard:</strong> Dashboard for certificate management</li>
+                    <li><strong>Mainnet Deployment:</strong> Deploy to Ethereum mainnet</li>
+                    <li><strong>Mobile App:</strong> Native mobile application</li>
+                    <li><strong>Certificate Marketplace:</strong> Trade or transfer certificates</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Slide 14: Conclusion -->
+        <div class="slide slide-1">
+            <div class="slide-content">
+                <h2>🎉 Conclusion</h2>
+                <div class="conclusion-text">
+                    <p><strong>CertChain</strong> successfully demonstrates the power of blockchain technology in solving real-world problems.</p>
+                    <p style="margin-top: 30px;">✓ <strong>Immutable</strong> certificate records</p>
+                    <p>✓ <strong>Decentralized</strong> verification system</p>
+                    <p>✓ <strong>Transparent</strong> audit trail</p>
+                    <p>✓ <strong>Efficient</strong> and cost-effective</p>
+                    <p style="margin-top: 40px; font-size: 1.5rem; font-weight: 700;">
+                        Thank You! 🙏
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls">
+        <button onclick="previousSlide()">← Previous</button>
+        <button onclick="nextSlide()">Next →</button>
+    </div>
+
+    <!-- Slide Counter -->
+    <div class="slide-counter">
+        <span id="current-slide">1</span> / <span id="total-slides">14</span>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        document.getElementById('total-slides').textContent = totalSlides;
+
+        function showSlide(n) {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = (n + totalSlides) % totalSlides;
+            slides[currentSlide].classList.add('active');
+            document.getElementById('current-slide').textContent = currentSlide + 1;
+        }
+
+        function nextSlide() {
+            showSlide(currentSlide + 1);
+        }
+
+        function previousSlide() {
+            showSlide(currentSlide - 1);
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') nextSlide();
+            if (e.key === 'ArrowLeft') previousSlide();
+        });
+
+        // Initialize
+        showSlide(0);
+    </script>
+</body>
+</html>

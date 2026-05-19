@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CertChain — Blockchain Certificate Platform</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #060b18;
+      --surface: #0d1526;
+      --surface2: #111d35;
+      --border: #1e2d4a;
+      --border2: #243352;
+      --primary: #6366f1;
+      --primary2: #818cf8;
+      --purple: #a78bfa;
+      --text: #e2e8f0;
+      --text2: #94a3b8;
+      --text3: #64748b;
+      --green: #22c55e;
+      --green-bg: #052e16;
+      --green-border: #14532d;
+      --red-bg: #450a0a;
+      --red-border: #7f1d1d;
+      --blue-bg: #0c1e3d;
+      --blue-border: #1d4ed8;
+    }
+
+    body {
+      font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── NAV ── */
+    nav {
+      background: rgba(6,11,24,0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 1.1rem;
+      background: linear-gradient(135deg, #6366f1, #a78bfa);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .nav-brand span { font-size: 1.3rem; -webkit-text-fill-color: initial; }
+    .nav-right { display: flex; align-items: center; gap: 12px; }
+    .network-pill {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 500;
+      background: var(--surface2);
+      border: 1px solid var(--border2);
+      color: var(--text2);
+    }
+    .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--text3); }
+    .dot.green { background: var(--green); box-shadow: 0 0 6px #22c55e88; }
+
+    /* ── HERO ── */
+    .hero {
+      text-align: center;
+      padding: 56px 24px 40px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -80px; left: 50%;
+      transform: translateX(-50%);
+      width: 600px; height: 300px;
+      background: radial-gradient(ellipse, rgba(99,102,241,0.15) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero h1 {
+      font-size: 2.4rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #e2e8f0 0%, #a78bfa 50%, #6366f1 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 12px;
+      line-height: 1.2;
+    }
+    .hero p {
+      color: var(--text2);
+      font-size: 1rem;
+      max-width: 480px;
+      margin: 0 auto 32px;
+      line-height: 1.6;
+    }
+
+    /* ── STATS ── */
+    .stats-row {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 40px;
+      padding: 0 24px;
+    }
+    .stat-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      font-size: 0.82rem;
+      color: var(--text2);
+    }
+    .stat-pill .icon { font-size: 1rem; }
+    .stat-pill strong { color: var(--text); }
+
+    /* ── CONTAINER ── */
+    .container { max-width: 680px; margin: 0 auto; padding: 0 20px 60px; }
+
+    /* ── CARD ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      margin-bottom: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, #6366f1, transparent);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .card:hover::before { opacity: 1; }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .card-icon {
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #6366f133, #a78bfa22);
+      border: 1px solid #6366f144;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+    }
+    .card h2 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .card h2 span { color: var(--text3); font-weight: 400; font-size: 0.82rem; margin-left: 6px; }
+
+    /* ── WALLET ── */
+    .wallet-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 14px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+    .badge.connected { background: #052e1688; color: #86efac; border: 1px solid var(--green-border); }
+    .badge.disconnected { background: var(--surface2); color: var(--text3); border: 1px solid var(--border2); }
+    .wallet-address {
+      margin-top: 10px;
+      font-size: 0.8rem;
+      color: var(--text3);
+      font-family: monospace;
+      letter-spacing: 0.05em;
+    }
+
+    /* ── FORM ── */
+    .form-group { margin-bottom: 16px; }
+    label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: var(--text2);
+      margin-bottom: 6px;
+    }
+    .label-optional {
+      font-size: 0.75rem;
+      color: var(--text3);
+      font-weight: 400;
+      margin-left: 4px;
+    }
+    input[type="text"] {
+      width: 100%;
+      padding: 10px 14px;
+      background: var(--bg);
+      border: 1px solid var(--border2);
+      border-radius: 10px;
+      color: var(--text);
+      font-size: 0.9rem;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    input[type="text"]:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
+    }
+    input[type="text"]::placeholder { color: var(--text3); }
+
+    /* ── FILE UPLOAD ── */
+    .file-upload-area {
+      border: 2px dashed var(--border2);
+      border-radius: 10px;
+      padding: 24px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      position: relative;
+      background: var(--bg);
+    }
+    .file-upload-area:hover { border-color: var(--primary); background: #0d1526; }
+    .file-upload-area input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+    .file-upload-area .upload-icon { font-size: 1.8rem; margin-bottom: 6px; }
+    .file-upload-area p { color: var(--text3); font-size: 0.82rem; }
+    .file-upload-area .file-name { color: var(--purple); font-size: 0.85rem; margin-top: 4px; font-weight: 500; }
+
+    .ipfs-preview {
+      margin-top: 10px;
+      padding: 10px 14px;
+      background: #0a1628;
+      border: 1px solid var(--border2);
+      border-radius: 8px;
+      font-size: 0.78rem;
+      color: var(--text2);
+      word-break: break-all;
+      display: none;
+    }
+    .ipfs-preview a { color: var(--primary2); text-decoration: none; }
+    .ipfs-preview a:hover { text-decoration: underline; }
+
+    /* ── BUTTONS ── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s, box-shadow 0.2s;
+    }
+    .btn:active { transform: scale(0.97); }
+    .btn:disabled { opacity: 0.35; cursor: not-allowed; }
+    .btn-primary {
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      color: white;
+      box-shadow: 0 4px 14px rgba(99,102,241,0.3);
+    }
+    .btn-primary:hover:not(:disabled) { box-shadow: 0 4px 20px rgba(99,102,241,0.5); }
+    .btn-secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border2); }
+    .btn-secondary:hover:not(:disabled) { background: var(--border); }
+    .btn-success { background: #166534; color: #86efac; border: 1px solid var(--green-border); }
+    .btn-sm { padding: 7px 16px; font-size: 0.82rem; }
+    .btn-row { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
+
+    /* ── STATUS ── */
+    .status-msg {
+      margin-top: 12px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      display: none;
+      line-height: 1.5;
+    }
+    .status-msg.error { background: var(--red-bg); color: #fca5a5; border: 1px solid var(--red-border); display: block; }
+    .status-msg.success { background: var(--green-bg); color: #86efac; border: 1px solid var(--green-border); display: block; }
+    .status-msg.info { background: var(--blue-bg); color: #93c5fd; border: 1px solid var(--blue-border); display: block; }
+    .status-msg.warning { background: #431407; color: #fdba74; border: 1px solid #92400e; display: block; }
+
+    /* ── CERT PREVIEW ── */
+    #certPreview { display: none; margin-top: 28px; }
+
+    .cert-card {
+      position: relative;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 25px 80px rgba(99,102,241,0.35), 0 0 0 1px rgba(139,92,246,0.3);
+    }
+
+    /* Animated gradient background */
+    .cert-bg {
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg,
+        #0f0c29 0%, #1a0a3e 20%,
+        #0d1b4b 40%, #1a1060 60%,
+        #2d1b69 80%, #0f0c29 100%);
+      z-index: 0;
+    }
+    .cert-bg::after {
+      content: '';
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse at 20% 20%, rgba(99,102,241,0.25) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 80%, rgba(167,139,250,0.2) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 50%, rgba(236,72,153,0.08) 0%, transparent 60%);
+    }
+
+    .cert-content {
+      position: relative; z-index: 1;
+      padding: 36px 32px 28px;
+      text-align: center;
+    }
+
+    /* Corner brackets */
+    .cert-corner {
+      position: absolute;
+      width: 24px; height: 24px;
+      border-color: rgba(167,139,250,0.6);
+      border-style: solid;
+      z-index: 2;
+    }
+    .cert-corner.tl { top: 14px; left: 14px; border-width: 2px 0 0 2px; border-radius: 3px 0 0 0; }
+    .cert-corner.tr { top: 14px; right: 14px; border-width: 2px 2px 0 0; border-radius: 0 3px 0 0; }
+    .cert-corner.bl { bottom: 14px; left: 14px; border-width: 0 0 2px 2px; border-radius: 0 0 0 3px; }
+    .cert-corner.br { bottom: 14px; right: 14px; border-width: 0 2px 2px 0; border-radius: 0 0 3px 0; }
+
+    /* Header section */
+    .cert-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+    .cert-logo {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, #6366f1, #a78bfa);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem;
+      box-shadow: 0 4px 12px rgba(99,102,241,0.4);
+    }
+    .cert-org-name {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      background: linear-gradient(135deg, #a78bfa, #818cf8);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .cert-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 14px;
+      background: rgba(34,197,94,0.12);
+      border: 1px solid rgba(34,197,94,0.3);
+      border-radius: 999px;
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #86efac;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+    .cert-badge::before { content: '●'; color: #22c55e; font-size: 0.5rem; }
+
+    .cert-presents {
+      font-size: 0.78rem;
+      color: #94a3b8;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .cert-name {
+      font-size: 2.8rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #fde68a 0%, #fbbf24 40%, #f59e0b 70%, #fcd34d 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin: 6px 0 4px;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      filter: drop-shadow(0 0 24px rgba(251,191,36,0.35));
+    }
+
+    .cert-completed {
+      font-size: 0.78rem;
+      color: #94a3b8;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .cert-course {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #e0e7ff;
+      letter-spacing: 0.01em;
+      padding: 8px 20px;
+      background: rgba(99,102,241,0.1);
+      border: 1px solid rgba(99,102,241,0.2);
+      border-radius: 8px;
+      display: inline-block;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .cert-divider {
+      border: none;
+      height: 1px;
+      background: linear-gradient(90deg,
+        transparent 0%,
+        rgba(99,102,241,0.6) 20%,
+        rgba(167,139,250,0.8) 50%,
+        rgba(99,102,241,0.6) 80%,
+        transparent 100%);
+      margin: 24px 0;
+    }
+
+    .cert-meta-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .cert-meta-item {
+      padding: 12px 10px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(99,102,241,0.15);
+      border-radius: 10px;
+      text-align: center;
+      transition: border-color 0.2s;
+    }
+    .cert-meta-item:hover { border-color: rgba(99,102,241,0.4); }
+
+    .cert-meta-item .meta-label {
+      font-size: 0.6rem;
+      color: #818cf8;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      margin-bottom: 5px;
+      font-weight: 700;
+    }
+    .cert-meta-item .meta-value {
+      font-size: 0.8rem;
+      color: #c7d2fe;
+      word-break: break-all;
+      font-weight: 500;
+    }
+    .cert-meta-item .meta-value a { color: #a78bfa; text-decoration: none; }
+    .cert-meta-item .meta-value a:hover { text-decoration: underline; }
+
+    .cert-footer-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid rgba(99,102,241,0.1);
+      font-size: 0.65rem;
+      color: #475569;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    .cert-footer-dot { width: 3px; height: 3px; border-radius: 50%; background: #6366f1; opacity: 0.6; }
+
+    /* ── HISTORY ── */
+    .history-empty { text-align: center; color: var(--text3); font-size: 0.85rem; padding: 24px 0; }
+    .history-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px;
+      background: var(--bg);
+      border: 1px solid var(--border2);
+      border-radius: 10px;
+      margin-bottom: 8px;
+      gap: 12px;
+      flex-wrap: wrap;
+      transition: border-color 0.2s;
+    }
+    .history-item:hover { border-color: var(--primary); }
+    .history-item-left { display: flex; flex-direction: column; gap: 3px; }
+    .history-item-id { font-size: 0.82rem; font-weight: 600; color: var(--text); font-family: monospace; }
+    .history-item-meta { font-size: 0.75rem; color: var(--text3); }
+    .history-item-meta strong { color: var(--text2); }
+    .history-count {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 10px;
+      background: rgba(99,102,241,0.12);
+      border: 1px solid rgba(99,102,241,0.25);
+      border-radius: 999px;
+      font-size: 0.75rem;
+      color: var(--primary2);
+      margin-left: 8px;
+    }
+
+    /* ── SPINNER ── */
+    .spinner {
+      display: inline-block;
+      width: 14px; height: 14px;
+      border: 2px solid rgba(255,255,255,0.25);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── FOOTER ── */
+    footer {
+      text-align: center;
+      padding: 24px;
+      color: var(--text3);
+      font-size: 0.78rem;
+      border-top: 1px solid var(--border);
+    }
+    footer a { color: var(--primary2); text-decoration: none; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 480px) {
+      .hero h1 { font-size: 1.8rem; }
+      .card { padding: 20px; }
+      .cert-name { font-size: 1.6rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-brand">
+    <span>🎓</span> CertChain
+  </div>
+  <div class="nav-right">
+    <div class="network-pill" id="networkPill">
+      <span class="dot" id="navDot"></span>
+      <span id="navNetwork">Not connected</span>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <h1>Blockchain Certificate<br>Platform</h1>
+  <p>Issue tamper-proof certificates on-chain with IPFS file storage. Verify authenticity instantly — no central authority needed.</p>
+</div>
+
+<!-- STATS -->
+<div class="stats-row">
+  <div class="stat-pill"><span class="icon">⛓️</span> <strong>Ethereum</strong> Blockchain</div>
+  <div class="stat-pill"><span class="icon">📦</span> <strong>IPFS</strong> Storage</div>
+  <div class="stat-pill"><span class="icon">🔒</span> <strong>Tamper-proof</strong> Records</div>
+  <div class="stat-pill"><span class="icon">⚡</span> <strong>Instant</strong> Verification</div>
+</div>
+
+<div class="container">
+
+  <!-- WALLET CARD -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon">🦊</div>
+      <h2>Wallet <span>Connect your MetaMask wallet</span></h2>
+    </div>
+    <div class="wallet-row">
+      <button class="btn btn-primary" id="connectBtn" onclick="connectWallet()">Connect Wallet</button>
+      <span class="badge disconnected" id="walletBadge">
+        <span class="dot" id="walletDot"></span>
+        <span id="walletStatus">Not connected</span>
+      </span>
+    </div>
+    <p class="wallet-address" id="walletAddress"></p>
+    <div class="status-msg" id="networkWarning"></div>
+  </div>
+
+  <!-- ISSUE CARD -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon">📜</div>
+      <h2>Issue Certificate <span>Store on blockchain</span></h2>
+    </div>
+
+    <div class="form-group">
+      <label>Certificate ID</label>
+      <input type="text" id="id" placeholder="e.g. CERT-2024-001" />
+    </div>
+    <div class="form-group">
+      <label>Student Name</label>
+      <input type="text" id="name" placeholder="e.g. Jane Doe" />
+    </div>
+    <div class="form-group">
+      <label>Course</label>
+      <input type="text" id="course" placeholder="e.g. Solidity Fundamentals" />
+    </div>
+
+    <div class="form-group">
+      <label>Certificate File <span class="label-optional">optional — uploaded to IPFS</span></label>
+      <div class="file-upload-area" id="uploadArea">
+        <input type="file" id="certFile" accept=".pdf,.png,.jpg,.jpeg" onchange="onFileSelected()" />
+        <div class="upload-icon">📄</div>
+        <p>Drag & drop or click to select a file</p>
+        <p class="file-name" id="fileName"></p>
+      </div>
+      <div class="ipfs-preview" id="ipfsPreview"></div>
+    </div>
+
+    <div class="form-group">
+      <label>Pinata JWT <span class="label-optional">for IPFS upload — <a href="https://app.pinata.cloud/keys" target="_blank" style="color:#818cf8">get one free</a></span></label>
+      <input type="text" id="pinataJwt" placeholder="eyJhbGci..." style="font-size:0.82rem; font-family: monospace;" />
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-secondary btn-sm" id="uploadBtn" onclick="uploadFile()" disabled>
+        ☁ Upload to IPFS
+      </button>
+      <button class="btn btn-primary" id="issueBtn" onclick="issue()" disabled>
+        ✦ Issue Certificate
+      </button>
+    </div>
+    <div class="status-msg" id="issueStatus"></div>
+    <p style="font-size:0.75rem;color:var(--text3);margin-top:10px">💡 File upload is optional — you can issue a certificate without it.</p>
+  </div>
+
+  <!-- VERIFY CARD -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon">🔍</div>
+      <h2>Verify Certificate <span>Check authenticity</span></h2>
+    </div>
+
+    <div class="form-group">
+      <label>Certificate ID</label>
+      <input type="text" id="verifyId" placeholder="Enter certificate ID to verify" />
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="verify()">🔍 Verify</button>
+    </div>
+    <div class="status-msg" id="verifyStatus"></div>
+
+    <div id="certPreview">
+      <div class="cert-card" id="certCard">
+        <div class="cert-bg"></div>
+        <div class="cert-corner tl"></div>
+        <div class="cert-corner tr"></div>
+        <div class="cert-corner bl"></div>
+        <div class="cert-corner br"></div>
+        <div class="cert-content">
+          <div class="cert-header-row">
+            <div class="cert-logo">🎓</div>
+            <div class="cert-org-name">CertChain</div>
+          </div>
+          <div class="cert-badge">Verified on Blockchain</div>
+          <p class="cert-presents">Certificate of Completion</p>
+          <p class="cert-presents">This certifies that</p>
+          <p class="cert-name" id="previewName"></p>
+          <p class="cert-completed">has successfully completed</p>
+          <p class="cert-course" id="previewCourse"></p>
+          <hr class="cert-divider">
+          <div class="cert-meta-grid">
+            <div class="cert-meta-item">
+              <div class="meta-label">📅 Date Issued</div>
+              <div class="meta-value" id="previewDate"></div>
+            </div>
+            <div class="cert-meta-item">
+              <div class="meta-label">🔖 Certificate ID</div>
+              <div class="meta-value" id="previewId"></div>
+            </div>
+            <div class="cert-meta-item">
+              <div class="meta-label">📦 IPFS File</div>
+              <div class="meta-value" id="previewIPFS"></div>
+            </div>
+          </div>
+          <div class="cert-footer-row">
+            <span>Ethereum Blockchain</span>
+            <span class="cert-footer-dot"></span>
+            <span>Tamper-proof</span>
+            <span class="cert-footer-dot"></span>
+            <span>Immutable Record</span>
+          </div>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-success btn-sm" onclick="downloadPDF()">⬇ Download PDF</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- HISTORY CARD -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon">📋</div>
+      <h2>My Certificates <span>Issued by your wallet</span></h2>
+    </div>
+    <div class="btn-row" style="margin-top:0">
+      <button class="btn btn-secondary btn-sm" id="historyBtn" onclick="loadHistory()" disabled>
+        🔄 Load History
+      </button>
+    </div>
+    <div class="status-msg" id="historyStatus"></div>
+    <div id="historyList" style="margin-top:16px"></div>
+  </div>
+
+</div>
+<footer>
+  Built with ❤️ on <a href="https://ethereum.org" target="_blank">Ethereum</a> &amp; <a href="https://ipfs.tech" target="_blank">IPFS</a> &nbsp;·&nbsp; CertChain &copy; 2024
+</footer>
+
+<script type="module">
+import { ethers } from "https://esm.sh/ethers@6";
+
+const SEPOLIA_CHAIN_ID = 11155111;
+const LOCAL_CHAIN_ID = 31337;
+
+const CONTRACT_ADDRESSES = {
+  31337: "0xe7f1725e7734ce288f8367e1bb143e90bb3f0512",
+  11155111: "0x67d5d095425c4f844301e73fc05f1c767ef13f6c",
+};
+const CONTRACT_ADDRESS = window.CONTRACT_ADDRESS || null;
+
+const PINATA_JWT = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiJhMGQyZjYyMy00OWE0LTRjYmItOGY5Ni1iZTFmODJkNjA1YzQiLCJlbWFpbCI6ImFkaXR5YWxhbmdoZTI2QGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJwaW5fcG9saWN5Ijp7InJlZ2lvbnMiOlt7ImRlc2lyZWRSZXBsaWNhdGlvbkNvdW50IjoxLCJpZCI6IkZSQTEifSx7ImRlc2lyZWRSZXBsaWNhdGlvbkNvdW50IjoxLCJpZCI6Ik5ZQzEifV0sInZlcnNpb24iOjF9LCJtZmFfZW5hYmxlZCI6ZmFsc2UsInN0YXR1cyI6IkFDVElWRSJ9LCJhdXRoZW50aWNhdGlvblR5cGUiOiJzY29wZWRLZXkiLCJzY29wZWRLZXlLZXkiOiI1ZDZmNGU1NmUzZjlhMGE1YWIwYiIsInNjb3BlZEtleVNlY3JldCI6IjdjNTY0N2FjYTA4MTIxMTJhMjczYTJiOTcwNGY5YWEyYWM1MDdlNTRhMDkzYzNjYTY1ODllYjhlZDlmMTA0MjEiLCJleHAiOjE4MDg2NTE3NjF9.MQ9rCUUdfpgM83nUiyBJKpVE8rGtSX7SZyPCaJnLloY";
+
+const CERTIFICATE_ABI = [
+  "function issueCertificate(string id, string studentName, string course, string ipfsHash) external",
+  "function verifyCertificate(string id) external view returns (string, string, string, uint256, address)",
+  "function getCertificatesByIssuer(address issuer) external view returns (string[])"
+];
+
+const state = { account: null, chainId: null, provider: null, signer: null, ipfsHash: "" };
+
+async function connectWallet() {
+  if (!window.ethereum) return setStatus("networkWarning", "MetaMask not installed. Install from https://metamask.io", "error");
+  try {
+    const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+    state.account = accounts[0];
+    state.provider = new ethers.BrowserProvider(window.ethereum);
+    state.signer = await state.provider.getSigner(state.account);
+    const net = await state.provider.getNetwork();
+    state.chainId = Number(net.chainId);
+    updateWalletUI();
+  } catch (err) {
+    setStatus("networkWarning", err.code === 4001 ? "Connection rejected by user" : err.message, "error");
+  }
+}
+
+function updateWalletUI() {
+  const badge = document.getElementById("walletBadge");
+  const dot = document.getElementById("walletDot");
+  const statusEl = document.getElementById("walletStatus");
+  const addrEl = document.getElementById("walletAddress");
+  const connectBtn = document.getElementById("connectBtn");
+  const networkWarning = document.getElementById("networkWarning");
+  const issueBtn = document.getElementById("issueBtn");
+  const navDot = document.getElementById("navDot");
+  const navNetwork = document.getElementById("navNetwork");
+
+  const allowedChain = state.chainId === SEPOLIA_CHAIN_ID || state.chainId === LOCAL_CHAIN_ID;
+  const networkName = state.chainId === SEPOLIA_CHAIN_ID ? "Sepolia" : state.chainId === LOCAL_CHAIN_ID ? "Hardhat Local" : `Chain ${state.chainId}`;
+
+  if (state.account) {
+    badge.className = "badge connected";
+    dot.className = "dot green";
+    statusEl.textContent = "Connected";
+    addrEl.textContent = state.account.slice(0, 8) + "..." + state.account.slice(-6);
+    connectBtn.textContent = "Connected";
+    connectBtn.disabled = true;
+    navDot.className = "dot green";
+    navNetwork.textContent = networkName;
+    document.getElementById("historyBtn").disabled = false;
+  } else {
+    badge.className = "badge disconnected";
+    dot.className = "dot";
+    statusEl.textContent = "Not connected";
+    addrEl.textContent = "";
+    connectBtn.disabled = false;
+    navDot.className = "dot";
+    navNetwork.textContent = "Not connected";
+    document.getElementById("historyBtn").disabled = true;
+  }
+
+  if (state.account && !allowedChain) {
+    networkWarning.innerHTML = `Wrong network (Chain ${state.chainId}). Please switch to Sepolia or Hardhat Local (31337).
+      <br><button class="btn btn-secondary btn-sm" style="margin-top:8px" onclick="switchToSepolia()">Switch to Sepolia</button>`;
+    networkWarning.className = "status-msg warning";
+    issueBtn.disabled = true;
+  } else {
+    networkWarning.style.display = "none";
+    issueBtn.disabled = !state.account || !allowedChain;
+  }
+}
+
+window.onFileSelected = function () {
+  const file = document.getElementById("certFile").files[0];
+  document.getElementById("fileName").textContent = file ? file.name : "";
+  document.getElementById("uploadBtn").disabled = !file;
+  state.ipfsHash = "";
+  document.getElementById("ipfsPreview").style.display = "none";
+};
+
+window.uploadFile = async function () {
+  const file = document.getElementById("certFile").files[0];
+  if (!file) return;
+  const jwt = document.getElementById("pinataJwt").value.trim() || PINATA_JWT;
+  if (!jwt || jwt === "PASTE_YOUR_PINATA_JWT_HERE") {
+    return setStatus("issueStatus", "Paste your Pinata JWT in the field above to upload to IPFS", "error");
+  }
+  const uploadBtn = document.getElementById("uploadBtn");
+  uploadBtn.disabled = true;
+  uploadBtn.innerHTML = '<span class="spinner"></span> Uploading...';
+  try {
+    const form = new FormData();
+    form.append("file", file);
+    const res = await fetch("https://api.pinata.cloud/pinning/pinFileToIPFS", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${jwt}` },
+      body: form,
+    });
+    const data = await res.json();
+    if (!data.IpfsHash) throw new Error(data.error?.details || "Pinata upload failed");
+    state.ipfsHash = data.IpfsHash;
+    const url = `https://gateway.pinata.cloud/ipfs/${data.IpfsHash}`;
+    const preview = document.getElementById("ipfsPreview");
+    preview.style.display = "block";
+    preview.innerHTML = `✅ IPFS Hash: <strong>${data.IpfsHash}</strong><br><a href="${url}" target="_blank">View on IPFS ↗</a>`;
+    setStatus("issueStatus", "File uploaded to IPFS successfully ✓", "success");
+  } catch (err) {
+    setStatus("issueStatus", "IPFS upload failed: " + err.message, "error");
+  } finally {
+    uploadBtn.disabled = false;
+    uploadBtn.innerHTML = "☁ Upload to IPFS";
+  }
+};
+
+window.issue = async function () {
+  const issueBtn = document.getElementById("issueBtn");
+  const id = document.getElementById("id").value.trim();
+  const name = document.getElementById("name").value.trim();
+  const course = document.getElementById("course").value.trim();
+  if (!id || !name || !course) return setStatus("issueStatus", "Please fill in all required fields", "error");
+  if (!state.account) return setStatus("issueStatus", "Connect your wallet first", "error");
+  issueBtn.disabled = true;
+  issueBtn.innerHTML = '<span class="spinner"></span> Issuing...';
+  setStatus("issueStatus", "Waiting for transaction confirmation...", "info");
+  try {
+    const contract = new ethers.Contract(getContractAddress(), CERTIFICATE_ABI, state.signer);
+    const tx = await contract.issueCertificate(id, name, course, state.ipfsHash || "");
+    await tx.wait();
+    setStatus("issueStatus", `✅ Certificate issued successfully!\nTX: ${tx.hash}`, "success");
+    document.getElementById("id").value = "";
+    document.getElementById("name").value = "";
+    document.getElementById("course").value = "";
+    document.getElementById("certFile").value = "";
+    document.getElementById("fileName").textContent = "";
+    document.getElementById("ipfsPreview").style.display = "none";
+    state.ipfsHash = "";
+    // Auto-refresh history
+    if (document.getElementById("historyList").innerHTML !== "") window.loadHistory();
+  } catch (err) {
+    const msg = err.code === 4001 || err.code === "ACTION_REJECTED"
+      ? "Transaction rejected by user"
+      : (err.reason || err.message);
+    setStatus("issueStatus", "Error: " + msg, "error");
+  } finally {
+    issueBtn.disabled = false;
+    issueBtn.innerHTML = "✦ Issue Certificate";
+    updateWalletUI();
+  }
+};
+
+window.loadHistory = async function () {
+  if (!state.account) return;
+  const btn = document.getElementById("historyBtn");
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Loading...';
+  setStatus("historyStatus", "Fetching your certificates from blockchain...", "info");
+  document.getElementById("historyList").innerHTML = "";
+  try {
+    const readProvider = window.ethereum
+      ? new ethers.BrowserProvider(window.ethereum)
+      : new ethers.JsonRpcProvider("http://127.0.0.1:8545");
+    const contract = new ethers.Contract(getContractAddress(), CERTIFICATE_ABI, readProvider);
+    const ids = await contract.getCertificatesByIssuer(state.account);
+    document.getElementById("historyStatus").style.display = "none";
+
+    if (ids.length === 0) {
+      document.getElementById("historyList").innerHTML =
+        '<div class="history-empty">📭 No certificates issued by this wallet yet.</div>';
+    } else {
+      // Update card title with count
+      document.querySelector("#historyList").closest(".card").querySelector("h2").innerHTML =
+        `My Certificates <span>Issued by your wallet</span><span class="history-count">${ids.length}</span>`;
+
+      // Fetch details for each cert
+      const items = await Promise.all(ids.map(async (id) => {
+        try {
+          const [name, course, , date] = await contract.verifyCertificate(id);
+          return { id, name, course, date: Number(date) };
+        } catch { return { id, name: "—", course: "—", date: 0 }; }
+      }));
+
+      // Sort newest first
+      items.sort((a, b) => b.date - a.date);
+
+      document.getElementById("historyList").innerHTML = items.map(c => `
+        <div class="history-item">
+          <div class="history-item-left">
+            <div class="history-item-id">${c.id}</div>
+            <div class="history-item-meta">
+              <strong>${c.name}</strong> &nbsp;·&nbsp; ${c.course}
+              &nbsp;·&nbsp; ${c.date ? new Date(c.date * 1000).toLocaleDateString("en-US", { year:"numeric", month:"short", day:"numeric" }) : "—"}
+            </div>
+          </div>
+          <button class="btn btn-secondary btn-sm" onclick="quickVerify('${c.id}')">View ↗</button>
+        </div>
+      `).join("");
+    }
+  } catch (err) {
+    setStatus("historyStatus", "Error loading history: " + err.message, "error");
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = "🔄 Load History";
+  }
+};
+
+window.quickVerify = function (id) {
+  document.getElementById("verifyId").value = id;
+  document.getElementById("verifyId").scrollIntoView({ behavior: "smooth", block: "center" });
+  window.verify();
+};
+
+window.verify = async function () {
+  const id = document.getElementById("verifyId").value.trim();
+  if (!id) return setStatus("verifyStatus", "Please enter a certificate ID", "error");
+  setStatus("verifyStatus", "Verifying on blockchain...", "info");
+  document.getElementById("certPreview").style.display = "none";
+  try {
+    const readProvider = window.ethereum
+      ? new ethers.BrowserProvider(window.ethereum)
+      : new ethers.JsonRpcProvider("http://127.0.0.1:8545");
+    const contract = new ethers.Contract(getContractAddress(), CERTIFICATE_ABI, readProvider);
+    const [studentName, course, ipfsHash, date] = await contract.verifyCertificate(id);
+    if (!studentName) return setStatus("verifyStatus", "Certificate not found on blockchain", "error");
+    document.getElementById("verifyStatus").style.display = "none";
+    showCertPreview({ studentName, course, ipfsHash, date: date.toString() });
+  } catch (err) {
+    setStatus("verifyStatus", "Error: " + err.message, "error");
+  }
+};
+
+function showCertPreview(cert) {
+  document.getElementById("previewName").textContent = cert.studentName;
+  document.getElementById("previewCourse").textContent = cert.course;
+  document.getElementById("previewDate").textContent = new Date(Number(cert.date) * 1000).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
+  document.getElementById("previewId").textContent = cert.id || document.getElementById("verifyId").value;
+
+  const ipfsEl = document.getElementById("previewIPFS");
+  if (cert.ipfsHash) {
+    const url = `https://gateway.pinata.cloud/ipfs/${cert.ipfsHash}`;
+    ipfsEl.innerHTML = `<a href="${url}" target="_blank">${cert.ipfsHash.slice(0, 14)}...↗</a>`;
+  } else {
+    ipfsEl.textContent = "N/A";
+  }
+
+  document.getElementById("certPreview").style.display = "block";
+}
+
+window.downloadPDF = function () {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
+  const name = document.getElementById("previewName").textContent;
+  const course = document.getElementById("previewCourse").textContent;
+  const date = document.getElementById("previewDate").textContent;
+
+  doc.setFillColor(6, 11, 24);
+  doc.rect(0, 0, 297, 210, "F");
+  doc.setFillColor(13, 21, 38);
+  doc.rect(8, 8, 281, 194, "F");
+  doc.setDrawColor(99, 102, 241);
+  doc.setLineWidth(1.5);
+  doc.rect(8, 8, 281, 194);
+  doc.setDrawColor(167, 139, 250);
+  doc.setLineWidth(0.5);
+  doc.rect(12, 12, 273, 186);
+
+  doc.setTextColor(165, 180, 252);
+  doc.setFontSize(9);
+  doc.text("✦  CERTIFICATE OF COMPLETION  ✦", 148.5, 35, { align: "center" });
+
+  doc.setTextColor(199, 210, 254);
+  doc.setFontSize(13);
+  doc.text("This certifies that", 148.5, 52, { align: "center" });
+
+  doc.setTextColor(251, 191, 36);
+  doc.setFontSize(34);
+  doc.setFont(undefined, "bold");
+  doc.text(name, 148.5, 80, { align: "center" });
+
+  doc.setTextColor(165, 180, 252);
+  doc.setFontSize(12);
+  doc.setFont(undefined, "normal");
+  doc.text("has successfully completed", 148.5, 98, { align: "center" });
+
+  doc.setTextColor(224, 231, 255);
+  doc.setFontSize(20);
+  doc.setFont(undefined, "bold");
+  doc.text(course, 148.5, 118, { align: "center" });
+
+  doc.setDrawColor(99, 102, 241);
+  doc.setLineWidth(0.3);
+  doc.line(60, 130, 237, 130);
+
+  doc.setTextColor(129, 140, 248);
+  doc.setFontSize(10);
+  doc.setFont(undefined, "normal");
+  doc.text(`Date Issued: ${date}`, 148.5, 145, { align: "center" });
+  doc.text("Powered by CertChain — Blockchain Certificate Platform", 148.5, 185, { align: "center" });
+
+  doc.save(`CertChain-${name.replace(/\s+/g, "-")}.pdf`);
+};
+
+window.switchToSepolia = async function () {
+  try {
+    await window.ethereum.request({ method: "wallet_switchEthereumChain", params: [{ chainId: "0xaa36a7" }] });
+  } catch (err) {
+    if (err.code === 4902) {
+      await window.ethereum.request({
+        method: "wallet_addEthereumChain",
+        params: [{ chainId: "0xaa36a7", chainName: "Sepolia", nativeCurrency: { name: "SepoliaETH", symbol: "ETH", decimals: 18 }, rpcUrls: ["https://rpc.sepolia.org"], blockExplorerUrls: ["https://sepolia.etherscan.io"] }],
+      });
+    }
+  }
+};
+
+function getContractAddress() {
+  if (CONTRACT_ADDRESS) return CONTRACT_ADDRESS;
+  const addr = CONTRACT_ADDRESSES[state.chainId];
+  if (!addr) throw new Error(`No contract address for chain ${state.chainId}`);
+  return addr;
+}
+
+function setStatus(id, msg, type) {
+  const el = document.getElementById(id);
+  el.textContent = msg;
+  el.className = "status-msg " + type;
+  el.style.display = "block";
+}
+
+window.connectWallet = connectWallet;
+
+async function checkMetaMaskOnLoad() {
+  if (!window.ethereum) {
+    setStatus("networkWarning", "⚠ MetaMask is not installed. Get it from https://metamask.io", "error");
+    document.getElementById("connectBtn").disabled = true;
+    return;
+  }
+  try {
+    const accounts = await window.ethereum.request({ method: "eth_accounts" });
+    if (accounts.length > 0) {
+      state.account = accounts[0];
+      state.provider = new ethers.BrowserProvider(window.ethereum);
+      state.signer = await state.provider.getSigner(state.account);
+      const net = await state.provider.getNetwork();
+      state.chainId = Number(net.chainId);
+    }
+    updateWalletUI();
+  } catch { updateWalletUI(); }
+}
+
+checkMetaMaskOnLoad();
+
+// Auto-verify if URL has ?verify=CERT_ID
+const urlParams = new URLSearchParams(window.location.search);
+const autoVerifyId = urlParams.get("verify");
+if (autoVerifyId) {
+  document.getElementById("verifyId").value = autoVerifyId;
+  setTimeout(() => window.verify(), 800);
+}
+
+if (window.ethereum) {
+  window.ethereum.on("accountsChanged", (accounts) => {
+    state.account = accounts[0] || null;
+    state.signer = null;
+    if (state.account && state.provider) state.provider.getSigner().then(s => { state.signer = s; });
+    updateWalletUI();
+  });
+  window.ethereum.on("chainChanged", (chainId) => {
+    state.chainId = parseInt(chainId, 16);
+    updateWalletUI();
+  });
+}
+</script>
+</body>
+</html>
